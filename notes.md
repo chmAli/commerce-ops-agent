@@ -37,3 +37,35 @@ When removed "never guess" from system.
 Q: Which orders are unfulfilled for more than 3 days, and how many days each?
 14 orders are unfulfilled. 
 Count is wrong. They are 13 not 14
+------------
+Q: What is the total revenue of fulfilled orders?
+Response: **Total revenue of fulfilled orders: 174,600.** This covers 13 orders. The data has no currency, so the figure is in the store's price units.
+
+| Order | Total |
+|---|---|
+| #1003 | 7,800 |
+| #1004 | 23,400 |
+| #1009 | 17,400 |
+| #1010 | 15,600 |
+| #1011 | 19,200 |
+| #1013 | 3,000 |
+| #1017 | 2,700 |
+| #1020 | 20,400 |
+| #1021 | 18,900 |
+| #1024 | 9,300 |
+| #1026 | 9,600 |
+| #1028 | 24,300 |
+| #1030 | 3,000 |
+
+I calculated each total as price × qty, summed over the items in the order. The figure excludes shipping, taxes and discounts, because the data doesn't include them.
+
+Verdict: It seems correct
+--------------
+Q: Which customer has the most open orders?
+Response: **Bilal Ahmed** has the most open (unfulfilled) orders, with 4: #1002, #1005, #1022 and #1027.
+
+Next are Hina Raza (3: #1006, #1008, #1023) and Ayesha Khan (3: #1007, #1019, #1025). Usman Tariq has 2 and Sara Malik has 1.
+
+I counted only unfulfilled orders as "open".
+
+Verdict: Correct.

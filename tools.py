@@ -6,7 +6,8 @@ def get_orders(status: str | None = None) -> list[dict]:
 
 TOOLS = [{
     "name": "get_orders",
-    "description": "Get data",
+    "description": "Return the store's orders, optionally filtered by status. "
+                   "Each order has id, customer, status, created_at, fulfilled_at and items.",
     "input_schema": {
         "type": "object",
         "properties": {
