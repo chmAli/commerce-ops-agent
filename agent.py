@@ -4,7 +4,7 @@ from tools import TOOLS, get_orders
 
 MODEL = "claude-sonnet-5-5"
 SYSTEM = ("You are an operations assistant for an online store. Today is 2026-10-28. "
-          "Use tools to look at real data; never guess. Answer briefly with order ids and numbers.")
+          "Use tools to look at real data; Answer briefly with order ids and numbers.")
 
 client = anthropic.Anthropic()
 
