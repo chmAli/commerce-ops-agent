@@ -1,17 +1,19 @@
-import json
+import json, sys
 import anthropic
-from tools import TOOLS, get_orders
+from tools import TOOLS, FUNCTIONS
 
 MODEL = "claude-sonnet-5-5"
 SYSTEM = ("You are an operations assistant for an online store. Today is 2026-10-28. "
-          "Use tools to look at real data; never guess. Answer briefly with order ids and numbers.")
+          "Use tools to look at real data; never guess. "
+          "For counts, totals and dates, use the numbers the tools return; never count or calculate yourself. "
+          "Answer briefly with order ids and numbers.")
 
 client = anthropic.Anthropic()
 
 def run_tool(name, args):
-    if name == "get_orders":
-        return get_orders(**args)
-    raise ValueError(f"unknown tool {name}")
+    if name not in FUNCTIONS:
+        return {"error": f"unknown tool {name}"}
+    return FUNCTIONS[name](**args)
 
 def ask(question: str) -> str:
     messages = [{"role": "user", "content": question}]
@@ -26,8 +28,9 @@ def ask(question: str) -> str:
             if b.type == "tool_use":
                 print(f"-> {b.name}({b.input})")
                 results.append({"type": "tool_result", "tool_use_id": b.id,
-                                "content": json.dumps(run_tool(b.name, b.input))})
+                                "content": json.dumps(run_tool(b.name, b.input), default=str)})
         messages.append({"role": "user", "content": results})
 
 if __name__ == "__main__":
-    print(ask("Which customer has the most open orders?"))
+    question = " ".join(sys.argv[1:]) or "Which orders are unfulfilled for more than 3 days, and how many days each?"
+    print(ask(question))

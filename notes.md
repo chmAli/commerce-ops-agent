@@ -69,3 +69,34 @@ Next are Hina Raza (3: #1006, #1008, #1023) and Ayesha Khan (3: #1007, #1019, #1
 I counted only unfulfilled orders as "open".
 
 Verdict: Correct.
+
+---------------
+
+# Day2
+
+uv run answer_key.py
+1. Unfulfilled > 3 days: [('#1016', 12), ('#1027', 11), ('#1007', 10), ('#1014', 10), ('#1019', 10), ('#1025', 10), ('#1002', 9), ('#1008', 9), ('#1006', 8), ('#1012', 6), ('#1022', 6)]
+   Total unfulfilled: 13
+2. Cancelled since Mon 26 Oct: [('#1001', '2026-10-26'), ('#1015', '2026-10-28'), ('#1029', '2026-10-26')]
+3. Fulfilled revenue (PKR): 174600
+4. Open orders by customer: [('Bilal Ahmed', 4), ('Hina Raza', 3), ('Ayesha Khan', 3), ('Usman Tariq', 2), ('Sara Malik', 1)]
+5. Units sold by SKU (fulfilled): [('SNEAKER-42', 16), ('CAP-RED', 9), ('TSHIRT-BLK-M', 8), ('JEANS-32', 6), ('TSHIRT-WHT-L', 3)]
+6. Fulfilled revenue by city: [('Lahore', 72600), ('Multan', 32400), ('Karachi', 29700), ('Faisalabad', 24300), ('Islamabad', 15600)]
+## Day 2 results (checked against answer_key.py) — score 6/6
+
+| # | Question | Tool calls | Verdict |
+|---|---|---|---|
+| Q1 | Unfulfilled > 3 days + total | get_orders(status=unfulfilled) | ✓ 13 total (Day 1 bug fixed via `count`), 11 late, days right. "11" was still counted by the model → fix: older_than_days filter |
+| Q2 | Cancelled this week | get_orders(cancelled, date_field=cancelled_at, 26–28 Oct) | ✓ 3 (#1001, #1029, #1015). New cancelled_at field made it answerable |
+| Q3 | Revenue of fulfilled orders | order_stats(status=fulfilled) | ✓ PKR 174,600, 13 orders, 42 units — all from SQL |
+| Q4 | Customer with most open orders | order_stats(unfulfilled, group_by=customer) | ✓ Bilal Ahmed, 4 orders |
+| Q5 | Best-selling SKU | order_stats ×3 (all / fulfilled / unfulfilled) | ✓ SNEAKER-42. Handled ambiguity: by units across all orders TSHIRT-WHT-L leads (27 vs 26), but 6 cancelled + 18 unfulfilled |
+| Q6 | City with most revenue | order_stats ×2 (all / fulfilled) | ✓ Lahore either way (72,600 fulfilled / 163,500 all) |
+| Bonus | Tell me about #1016 | get_order + an extra get_orders | ✓ items, total 11,700, 12 days. Extra call was unnecessary |
+
+Learnings:
+- Code does the maths, model decides what to compute: every number today came from SQL or `count`.
+- Model picked order_stats for every total/ranking question without being told which question → tool descriptions work.
+- Business definitions are missing: "revenue" and "best-selling" mean fulfilled orders in real life, but the agent starts from all orders (incl. cancelled). Fix: define them in SYSTEM or make fulfilled the default.
+- Adding one data field (cancelled_at) turned an unanswerable question into an exact one.
+- Watch for wasted tool calls (Bonus question): they cost money and time.
