@@ -27,8 +27,10 @@ def ask(question: str) -> str:
         for b in r.content:
             if b.type == "tool_use":
                 print(f"-> {b.name}({b.input})")
+                result = run_tool(b.name, b.input)
+                print(f"   <- {json.dumps(result, default=str)[:120]}")
                 results.append({"type": "tool_result", "tool_use_id": b.id,
-                                "content": json.dumps(run_tool(b.name, b.input), default=str)})
+                                "content": json.dumps(result, default=str)})
         messages.append({"role": "user", "content": results})
 
 if __name__ == "__main__":

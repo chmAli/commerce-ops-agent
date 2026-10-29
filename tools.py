@@ -29,10 +29,13 @@ def _where(status=None, date_field="created_at", date_from=None, date_to=None, c
     return " AND ".join(clauses), params
 
 
-def get_orders(status=None, date_field="created_at", date_from=None, date_to=None, customer=None):
+def get_orders(status=None, date_field="created_at", date_from=None, date_to=None, customer=None,
+               older_than_days=None):
     where, params = _where(status, date_field, date_from, date_to, customer)
     rows = _query(f"""SELECT o.*, CAST(julianday(?) - julianday(o.created_at) AS INTEGER) AS age_days
                       FROM orders o WHERE {where} ORDER BY o.created_at""", [TODAY] + params)
+    if older_than_days is not None:
+        rows = [r for r in rows if r["age_days"] > older_than_days]
     return {"count": len(rows), "orders": rows}
 
 
@@ -80,7 +83,11 @@ TOOLS = [
      "description": "List orders matching the filters. Returns an exact count and the orders; each order has "
                     "age_days (whole days since it was created, as of today). Use count and age_days "
                     "instead of counting or doing date maths yourself.",
-     "input_schema": {"type": "object", "properties": FILTERS, "required": []}},
+    "input_schema": {"type": "object",
+                     "properties": {**FILTERS,
+                                    "older_than_days": {"type": "integer",
+                                    "description": "Only orders created more than this many days ago"}},
+                    "required": []}},
     {"name": "get_order",
      "description": "Full details of one order, including line items and total in PKR.",
      "input_schema": {"type": "object", "properties": {"order_id": {"type": "string", "description": "e.g. #1016"}},
