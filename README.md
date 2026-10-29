@@ -14,3 +14,5 @@ customers) by calling tools over store data instead of guessing.
 
 Day 1: agent loop with one tool (`get_orders`), fake Shopify-style data.
 Next: more tools, SQLite, MCP server, evals.
+
+Day 3: MCP server (server.py), works in Claude Desktop

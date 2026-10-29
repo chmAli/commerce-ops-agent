@@ -1,6 +1,8 @@
 import sqlite3
+from pathlib import Path
 
-DB = "store.db"
+DB = Path(__file__).parent / "store.db"
+
 TODAY = "2026-10-28"  # must match TODAY in make_data.py
 DATE_FIELDS = {"created_at", "fulfilled_at", "cancelled_at"}
 
