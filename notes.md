@@ -100,3 +100,18 @@ Learnings:
 - Business definitions are missing: "revenue" and "best-selling" mean fulfilled orders in real life, but the agent starts from all orders (incl. cancelled). Fix: define them in SYSTEM or make fulfilled the default.
 - Adding one data field (cancelled_at) turned an unanswerable question into an exact one.
 - Watch for wasted tool calls (Bonus question): they cost money and time.
+
+## Day 2 wrap-up — Q1 v2
+
+- Added `older_than_days` to get_orders. Calling get_orders(status=unfulfilled, older_than_days=3) returns `count: 11` → the "11 late" number now comes from code, not the model.
+
+## Day 3 — MCP server
+
+- `server.py` publishes the same 4 functions from tools.py over MCP (stdio). Schemas come from type hints + docstrings (`Literal` → enum).
+- mcp 2.x renamed FastMCP → MCPServer (`from mcp.server.mcpserver import MCPServer`, `run(transport="stdio")`). Lesson: read the whole error; the fix was in it.
+- DB path built from `__file__` so the server works whatever folder it's started from.
+- MCP Inspector: order_stats with no filters → 30 orders, 107 units, PKR 352,800 (all statuses). Correct.
+- Claude Desktop launches server.py itself as a child process at app start; one process serves every call; restart the app after code changes.
+- Verified through MCP: get_orders(unfulfilled, older_than_days=3) → count 11 ✓; order_stats(unfulfilled, group_by=customer) → Bilal Ahmed 4 ✓.
+- Finding: order_stats always sorts by revenue, so for "most orders" Bilal comes 3rd in the list and the model must re-rank → add `order_by`.
+- Rule: never print() to stdout in a stdio server; use stderr / logging.

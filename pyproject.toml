@@ -1,10 +1,10 @@
 [project]
 name = "commerce-ops-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "LLM agent and MCP server for e-commerce operations questions"
 readme = "README.md"
 authors = [
-    { name = "ali-ekyam", email = "ali@ekyam.ai" }
+    { name = "Muhammad Ali Shan", email = "chmalishan@gmail.com" }
 ]
 requires-python = ">=3.10"
 dependencies = [
