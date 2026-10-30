@@ -12,6 +12,7 @@ def _query(sql, params=()):
     con.row_factory = sqlite3.Row  # rows come back as dict-like objects
     rows = [dict(r) for r in con.execute(sql, params)]
     con.close()
+
     return rows
 
 
@@ -60,15 +61,17 @@ def get_customer(name):
     return found
 
 
-def order_stats(group_by=None, status=None, date_field="created_at", date_from=None, date_to=None, customer=None):
+def order_stats(group_by=None, status=None, date_field="created_at", date_from=None, date_to=None, customer=None,
+                order_by="revenue"):
     group = {"customer": "o.customer", "status": "o.status", "sku": "i.sku", "city": "c.city"}.get(group_by, "'all'")
+    sort = {"orders": "orders", "units": "units", "revenue": "revenue_pkr"}.get(order_by, "revenue_pkr")
     where, params = _where(status, date_field, date_from, date_to, customer)
     return _query(f"""SELECT {group} AS grp, COUNT(DISTINCT o.id) AS orders, SUM(i.qty) AS units,
                              SUM(i.qty * i.price) AS revenue_pkr
                       FROM orders o
                       JOIN order_items i ON i.order_id = o.id
                       JOIN customers c ON c.name = o.customer
-                      WHERE {where} GROUP BY grp ORDER BY revenue_pkr DESC""", params)
+                      WHERE {where} GROUP BY grp ORDER BY {sort} DESC""", params)
 
 
 FILTERS = {
@@ -102,7 +105,9 @@ TOOLS = [
                     "the filters, optionally grouped by customer, status, sku or city. Use this for any count, "
                     "sum, ranking or most/least question.",
      "input_schema": {"type": "object",
-                      "properties": {"group_by": {"type": "string", "enum": ["customer", "status", "sku", "city"]},
+                      "properties": {
+                          "group_by": {"type": "string", "enum": ["customer", "status", "sku", "city"]},
+                          "order_by": {"type": "string", "enum": ["orders", "units", "revenue"], "description": "Sort the groups by this, highest first. Default revenue."},
                                      **FILTERS},
                       "required": []}},
 ]

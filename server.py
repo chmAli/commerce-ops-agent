@@ -34,12 +34,13 @@ def get_customer(name: str):
 @mcp.tool()
 def order_stats(group_by: Literal["customer", "status", "sku", "city"] | None = None,
                 status: Status | None = None, date_field: DateField = "created_at",
-                date_from: str | None = None, date_to: str | None = None, customer: str | None = None):
+                date_from: str | None = None, date_to: str | None = None, customer: str | None = None,
+                order_by: Literal["orders", "units", "revenue"] = "revenue"):
     """Exact totals computed in SQL: number of orders, units and revenue in PKR for orders
     matching the filters, optionally grouped. Use this for any count, sum, ranking or
     most/least question. Revenue normally means fulfilled orders."""
-    return tools.order_stats(group_by, status, date_field, date_from, date_to, customer)
+    return tools.order_stats(group_by, status, date_field, date_from, date_to, customer, order_by)
 
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    mcp.run(transport="stdio")serv

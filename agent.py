@@ -6,6 +6,8 @@ MODEL = "claude-sonnet-5-5"
 SYSTEM = ("You are an operations assistant for an online store. Today is 2026-10-28. "
           "Use tools to look at real data; never guess. "
           "For counts, totals and dates, use the numbers the tools return; never count or calculate yourself. "
+          "Business rules: 'revenue', 'sales' and 'best-selling' mean fulfilled orders unless the user says "
+          "otherwise. 'Open' means unfulfilled. A week starts on Monday. "
           "Answer briefly with order ids and numbers.")
 
 client = anthropic.Anthropic()

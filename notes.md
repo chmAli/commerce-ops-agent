@@ -129,3 +129,15 @@ What 20/20 really means:
 
 Lesson: an eval only measures what its checks look at. Write checks that would fail on the wrong answer, not just pass on the right one.
 - Checked `total_revenue` with `-s`: 3 tool calls — order_stats(group_by=status) [already contained fulfilled = 174,600], then order_stats({}) [352,800 all orders], then order_stats(status=fulfilled) [174,600 again]. It fetched both numbers to cover both meanings; the third call was redundant (same data as the first). Cost: each tool call is one more model round trip (time + money). Expect the business rule to cut this to 1 call → add a "max tool calls" check to the eval.
+
+## Day 4 part 3 — improve and re-measure (31 Oct)
+
+Changes: business rules in SYSTEM ("revenue / sales / best-selling = fulfilled orders", "open = unfulfilled", "week starts Monday"); `order_by` (orders / units / revenue) on order_stats, in tools.py, TOOLS schema and server.py, mapped through an allowlist dict so model text never goes into SQL.
+
+**Baseline 20/20 → after changes 20/20.** No case changed, nothing got worse. Run time 84 s → 74 s.
+
+What this tells me:
+- The score couldn't move, because the baseline was already 20/20 and the checks are lenient. The eval can't show the improvement it was built to measure.
+- `total_revenue` passed before the business rule only because the answer contained both numbers. To see the real effect, re-check its tool calls with `-s -k total_revenue` (baseline: 3 calls).
+- The ~10 s faster run hints at fewer tool calls overall, but one run isn't proof; the model isn't deterministic.
+- Next: make the eval able to fail — a `must_not` check (e.g. total_revenue must not contain 352800), a max-tool-calls check, and harder cases (ambiguous, multi-step, unanswerable). Then run the suite 2–3 times.
