@@ -115,3 +115,17 @@ Learnings:
 - Verified through MCP: get_orders(unfulfilled, older_than_days=3) → count 11 ✓; order_stats(unfulfilled, group_by=customer) → Bilal Ahmed 4 ✓.
 - Finding: order_stats always sorts by revenue, so for "most orders" Bilal comes 3rd in the list and the model must re-rank → add `order_by`.
 - Rule: never print() to stdout in a stdio server; use stderr / logging.
+
+## Day 4 — evals (baseline, 30 Oct)
+
+- Built `evals/`: 20 cases in `cases.py` (question + facts the answer must contain + expected tool), pytest runner in `test_agent.py`. Run: `uv run --env-file .env pytest evals -v` (~84 s, a few cents).
+- Agent changes: `ask()` records tool calls in `trace` (so tests can check which tool was used) and stops after `max_steps=10` (no endless tool loops).
+- **Baseline: 20/20 passed.**
+
+What 20/20 really means:
+- `total_revenue` ("What is our total revenue?") was expected to fail and passed. Most likely the answer mentions both 352,800 (all orders) and 174,600 (fulfilled), and a "must contain" check passes as long as the right number appears somewhere. The test is too lenient, not proof the agent knows the business rule. Check with: `pytest evals -v -s -k total_revenue`.
+- A perfect score means the eval set is too easy to find problems. Useful evals include cases that fail. Next: harder cases (ambiguous questions, multi-step questions, questions the data can't answer) and "must_not" checks.
+- One run isn't enough: the model isn't deterministic, so run the suite 2–3 times before trusting a score.
+
+Lesson: an eval only measures what its checks look at. Write checks that would fail on the wrong answer, not just pass on the right one.
+- Checked `total_revenue` with `-s`: 3 tool calls — order_stats(group_by=status) [already contained fulfilled = 174,600], then order_stats({}) [352,800 all orders], then order_stats(status=fulfilled) [174,600 again]. It fetched both numbers to cover both meanings; the third call was redundant (same data as the first). Cost: each tool call is one more model round trip (time + money). Expect the business rule to cut this to 1 call → add a "max tool calls" check to the eval.
