@@ -1,6 +1,9 @@
-import json, sys
+import json
+import sys
+
 import anthropic
-from tools import TOOLS, FUNCTIONS
+
+from tools import FUNCTIONS, TOOLS
 
 MODEL = "claude-sonnet-5-5"
 SYSTEM = ("You are an operations assistant for an online store. Today is 2026-10-28. "

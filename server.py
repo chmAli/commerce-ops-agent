@@ -1,5 +1,7 @@
 from typing import Literal
+
 from mcp.server.mcpserver import MCPServer
+
 import tools
 
 mcp = MCPServer("commerce-ops", version="0.1.0")
@@ -43,4 +45,4 @@ def order_stats(group_by: Literal["customer", "status", "sku", "city"] | None = 
 
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")serv
+    mcp.run(transport="stdio")
