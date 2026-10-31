@@ -6,7 +6,7 @@ CASES = [
     {"id": "cancelled_week_count", "q": "How many orders were cancelled this week?", "must": ["3"]},
     {"id": "cancelled_week_ids", "q": "Which orders were cancelled this week?", "must": ["#1001", "#1015", "#1029"]},
     {"id": "fulfilled_revenue", "q": "What is the total revenue of fulfilled orders?", "must": ["174600"], "tool": "order_stats"},
-        {"id": "total_revenue", "q": "What is our total revenue?", "must": ["174600"], "must_not": ["352800"], "max_calls": 1},
+    {"id": "total_revenue", "q": "What is our total revenue?", "must": ["174600"], "must_not": ["352800"], "max_calls": 1},
     {"id": "fulfilled_units", "q": "How many units have we shipped in fulfilled orders?", "must": ["42"]},
     {"id": "top_open_customer", "q": "Which customer has the most open orders?", "must": ["Bilal Ahmed"], "tool": "order_stats"},
     {"id": "bilal_open", "q": "How many open orders does Bilal Ahmed have?", "must": ["4"]},

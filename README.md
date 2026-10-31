@@ -6,6 +6,10 @@ An AI agent that answers e-commerce operations questions (stuck orders, revenue,
 
 I work on Shopify and NetSuite integrations, and I built this to tackle the AI side of that world: getting exact numbers out of an LLM system, and proving it with evals.
 
+**Demo (3 min):** https://youtu.be/tKpJAmB9jJ4
+
+[![Watch the 3-minute demo](https://img.youtube.com/vi/tKpJAmB9jJ4/hqdefault.jpg)](https://youtu.be/tKpJAmB9jJ4)
+
 ## What it looks like
 
 ```
