@@ -141,3 +141,19 @@ What this tells me:
 - `total_revenue` passed before the business rule only because the answer contained both numbers. To see the real effect, re-check its tool calls with `-s -k total_revenue` (baseline: 3 calls).
 - The ~10 s faster run hints at fewer tool calls overall, but one run isn't proof; the model isn't deterministic.
 - Next: make the eval able to fail — a `must_not` check (e.g. total_revenue must not contain 352800), a max-tool-calls check, and harder cases (ambiguous, multi-step, unanswerable). Then run the suite 2–3 times.
+
+## Day 5 part 1 — harder evals (31 Oct)
+
+Added `must_not` and `max_calls` checks; `total_revenue` now must say 174,600, must not say 352,800, in at most 1 tool call; 5 harder cases (tie, last-week boundary, order_by, average, unanswerable refunds). 25 cases, run 3 times:
+
+| Run | Score | Failed |
+|---|---|---|
+| 1 | 24/25 | refunds_unknown |
+| 2 | 25/25 | — |
+| 3 | 24/25 | refunds_unknown |
+
+- **The business rule works, and now the eval can prove it:** `total_revenue` passed 3/3 with max_calls=1 and must_not 352800. Day 4 baseline: 3 tool calls and both numbers. Now: one call, one committed answer.
+- All four other hard cases passed 3/3: spotted the Ayesha/Bilal tie, excluded #1018 (cancelled last week), used order_by for "most orders", divided correctly for the average.
+- `refunds_unknown` failed 2 of 3 runs, but **the agent was right both times** ("the tools I have don't include any refund or payment data"; "the tools I have don't track refunds"). The test was wrong: my phrase list had "doesn't include" but not "don't include", and no "don't track". That's a flaky *test*, not a flaky agent. Fixed by adding the missing phrasings — legitimate because the agent's answers were correct.
+- Limit of string matching: correct answers can be worded in endless ways, so phrase lists keep breaking. This is exactly what LLM-as-judge is for (a second model call grading the answer against a rubric).
+- One answer said "cancellations account for PKR 0 in refunds", which treats cancellations as refunds and states a number. A judge rubric like "doesn't invent a refund amount" would flag that; string matching can't.

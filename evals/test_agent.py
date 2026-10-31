@@ -23,3 +23,9 @@ def test_case(case):
     if "tool" in case:
         used = [name for name, _ in trace]
         assert case["tool"] in used, f"expected tool {case['tool']}, used {used}"
+
+    for bad in case.get("must_not", []):
+        assert not contains(answer, bad), f"should not contain {bad!r}: {answer[:300]}"
+    if "max_calls" in case:
+        used = [name for name, _ in trace]
+        assert len(used) <= case["max_calls"], f"{len(used)} tool calls (max {case['max_calls']}): {used}"
